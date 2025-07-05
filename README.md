@@ -16,7 +16,7 @@
 ## 安装运行
 ```bash
 # 克隆项目
-git clone https://github.com/你的用户名/ProductionDecisionSystem.git
+git clone https://github.com/gyrifheiuifeow/ProductionDecisionSystem.git
 
 # 进入项目目录
 cd ProductionDecisionSystem
