@@ -1,3 +1,17 @@
+"""
+生产决策优化系统
+
+运行步骤：
+1. 安装依赖: pip install -r requirements.txt
+2. 启动服务: python app.py
+3. 访问地址: http://localhost:5001
+
+系统功能：
+- /sprt-test : SPRT抽样检测
+- /single-optimization : 单级生产优化
+- /multi-optimization : 多级协同优化
+- /generate-sample : 生成随机样本
+"""
 from flask import Flask, jsonify, request
 import random
 
