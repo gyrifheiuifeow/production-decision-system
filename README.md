@@ -16,10 +16,10 @@
 ## 安装运行
 ```bash
 # 克隆项目
-git clone https://github.com/gyrifheiuifeow/ProductionDecisionSystem.git
+git clone git@github.com:gyrifheiuifeow/production-decision-system.git
 
 # 进入项目目录
-cd ProductionDecisionSystem
+cd production-decision-system
 
 # 安装依赖
 pip install -r requirements.txt
