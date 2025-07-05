@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生产决策优化平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a3a, #2c3e50);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            background: var(--secondary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .system-status {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+        
+        .status-indicator.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            background: rgba(52, 152, 219, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--secondary);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .card-content {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #bdc3c7;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 25px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .results-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .results-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .clear-btn {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .clear-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+        }
+        
+        .results-content {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 15px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: rgba(39, 174, 96, 0.2);
+            color: var(--success);
+        }
+        
+        .status-error {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background: var(--success);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                justify-content: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>生产决策优化平台</h1>
+                    <p>基于SPRT抽样与多级优化算法的智能制造决策系统</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">系统状态: 检测中...</span>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <div class="card-title">SPRT抽样检测</div>
+                </div>
+                <div class="card-content">
+                    <p>使用序列概率比测试(SPRT)进行产品质量抽样检测，高效判断产品批次是否合格。</p>
+                </div>
+                <button class="btn" onclick="runSPRTTest()">
+                    <i class="fas fa-play"></i> 执行SPRT测试
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="card-title">单级优化生产</div>
+                </div>
+                <div class="card-content">
+                    <p>针对单一生产环节进行优化，最大化生产效率、产品质量并降低生产成本。</p>
+                </div>
+                <button class="btn btn-success" onclick="runSingleOptimization()">
+                    <i class="fas fa-bolt"></i> 执行单级优化
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <div class="card-title">多级优化生产</div>
+                </div>
+                <div class="card-content">
+                    <p>对整个生产流程进行多级协同优化，实现系统整体最优性能。</p>
+                </div>
+                <button class="btn btn-warning" onclick="runMultiOptimization()">
+                    <i class="fas fa-sync-alt"></i> 执行多级优化
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <div class="card-title">样本生成</div>
+                </div>
+                <div class="card-content">
+                    <p>生成随机样本数据，用于系统测试、算法验证和模拟分析。</p>
+                </div>
+                <button class="btn btn-danger" onclick="generateSamples()">
+                    <i class="fas fa-dice"></i> 生成随机样本
+                </button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="results">执行结果</div>
+            <div class="tab" data-tab="api">API文档</div>
+            <div class="tab" data-tab="help">帮助</div>
+        </div>
+        
+        <div class="tab-content active" id="resultsTab">
+            <div class="results-container">
+                <div class="results-header">
+                    <div class="results-title">执行结果</div>
+                    <button class="clear-btn" onclick="clearResults()">
+                        <i class="fas fa-trash-alt"></i> 清除结果
+                    </button>
+                </div>
+                <div class="results-content" id="resultsContent">
+                    <p>执行操作后，结果将显示在这里...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="apiTab">
+            <div class="results-container">
+                <div class="results-header">
+                    <div class="results-title">API文档</div>
+                </div>
+                <div class="results-content">
+                    <h3>后端API端点</h3>
+                    <p>后端运行在: <code>http://localhost:5001</code></p>
+                    
+                    <h4>SPRT测试</h4>
+                    <p><strong>端点:</strong> POST /sprt-test</p>
+                    <p><strong>参数:</strong> JSON对象包含测试参数</p>
+                    
+                    <h4>单级优化生产</h4>
+                    <p><strong>端点:</strong> POST /single-optimization</p>
+                    <p><strong>参数:</strong> JSON对象包含优化参数</p>
+                    
+                    <h4>多级优化生产</h4>
+                    <p><strong>端点:</strong> POST /multi-optimization</p>
+                    <p><strong>参数:</strong> JSON对象包含多级优化参数</p>
+                    
+                    <h4>生成随机样本</h4>
+                    <p><strong>端点:</strong> GET /generate-sample</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="helpTab">
+            <div class="results-container">
+                <div class="results-header">
+                    <div class="results-title">帮助中心</div>
+                </div>
+                <div class="results-content">
+                    <h3>常见问题</h3>
+                    
+                    <h4>1. 为什么显示"Network Error"？</h4>
+                    <p>请确保后端服务正在运行（端口5001）。检查控制台是否有错误信息。</p>
+                    
+                    <h4>2. 如何解决"Method Not Allowed"错误？</h4>
+                    <p>确保使用正确的HTTP方法（如POST用于优化操作）。</p>
+                    
+                    <h4>3. 如何检查系统状态？</h4>
+                    <p>页面顶部的状态指示器显示系统连接状态。绿色表示连接正常，红色表示连接问题。</p>
+                    
+                    <h4>4. 技术支持</h4>
+                    <p>邮箱: 2585495910@qq.com</p>
+                    <p>电话: 19726048331</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 生产决策优化平台 | 基于SPRT与多级优化算法 | 版本 2.1.0</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">操作成功完成！</span>
+    </div>
+    
+    <script>
+        // 标签切换功能
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签和内容的active类
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加active类到当前标签和对应内容
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab') + 'Tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 系统状态检查
+        async function checkSystemStatus() {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            try {
+                // 检查基础API是否可达
+                const response = await fetch('http://localhost:5001/');
+                if (response.ok) {
+                    statusIndicator.classList.add('active');
+                    statusText.textContent = '系统状态: 正常';
+                    statusIndicator.style.backgroundColor = '#27ae60';
+                } else {
+                    updateSystemStatusError('后端服务异常: ' + response.status);
+                }
+            } catch (error) {
+                updateSystemStatusError('网络错误: ' + error.message);
+            }
+        }
+        
+        function updateSystemStatusError(message) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            statusIndicator.classList.remove('active');
+            statusText.textContent = '系统状态: 异常 | ' + message;
+            statusIndicator.style.backgroundColor = '#e74c3c';
+        }
+        
+        // 显示通知
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = 'notification';
+            
+            if (isError) {
+                notification.classList.add('error');
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // SPRT测试
+        async function runSPRTTest() {
+            try {
+                showNotification('正在执行SPRT测试...');
+                
+                const response = await fetch('http://localhost:5001/sprt-test', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        sampleSize: 100,
+                        threshold: 0.05,
+                        maxIterations: 50
+                    })
+                });
+                
+                const result = await response.json();
+                
+                displayResult('SPRT测试结果', result);
+                showNotification('SPRT测试完成！');
+            } catch (error) {
+                console.error("SPRT测试失败:", error);
+                displayResult('SPRT测试失败', { error: error.message });
+                showNotification('SPRT测试失败: ' + error.message, true);
+            }
+        }
+        
+        // 单级优化生产
+        async function runSingleOptimization() {
+            try {
+                showNotification('正在执行单级优化...');
+                
+                const response = await fetch('http://localhost:5001/single-optimization', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        productionConstraints: {
+                            maxCost: 5000,
+                            minQuality: 0.95,
+                            timeLimit: 24
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                displayResult('单级优化结果', result);
+                showNotification('单级优化完成！');
+            } catch (error) {
+                console.error("单级优化失败:", error);
+                displayResult('单级优化失败', { error: error.message });
+                showNotification('单级优化失败: ' + error.message, true);
+            }
+        }
+        
+        // 多级优化生产
+        async function runMultiOptimization() {
+            try {
+                showNotification('正在执行多级优化...');
+                
+                const response = await fetch('http://localhost:5001/multi-optimization', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        stages: 3,
+                        constraints: {
+                            totalCost: 15000,
+                            overallQuality: 0.92,
+                            productionTime: 72
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                displayResult('多级优化结果', result);
+                showNotification('多级优化完成！');
+            } catch (error) {
+                console.error("多级优化失败:", error);
+                displayResult('多级优化失败', { error: error.message });
+                showNotification('多级优化失败: ' + error.message, true);
+            }
+        }
+        
+        // 生成随机样本
+        async function generateSamples() {
+            try {
+                showNotification('正在生成随机样本...');
+                
+                const response = await fetch('http://localhost:5001/generate-sample');
+                const data = await response.json();
+                displayResult('随机样本', data.samples);
+                showNotification('样本生成完成！');
+            } catch (error) {
+                console.error("样本生成失败:", error);
+                displayResult('样本生成失败', { error: error.message });
+                showNotification('样本生成失败: ' + error.message, true);
+            }
+        }
+        
+        // 显示结果
+        function displayResult(title, data) {
+            const container = document.getElementById('resultsContent');
+            
+            // 创建状态徽章
+            let statusBadge = '';
+            if (data.status === 'success') {
+                statusBadge = '<span class="status-badge status-success">成功</span>';
+            } else if (data.status === 'error') {
+                statusBadge = '<span class="status-badge status-error">错误</span>';
+            }
+            
+            // 格式化输出
+            container.innerHTML = `
+                <div class="result-header">
+                    <h2>${title} ${statusBadge}</h2>
+                    <p>${new Date().toLocaleString()}</p>
+                </div>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            
+            // 滚动到底部
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // 清除结果
+        function clearResults() {
+            document.getElementById('resultsContent').innerHTML = 
+                '<p>执行操作后，结果将显示在这里...</p>';
+        }
+        
+        // 页面加载时检查系统状态
+        window.onload = function() {
+            checkSystemStatus();
+            
+            // 模拟后端连接测试
+            setTimeout(() => {
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.classList.add('active');
+                document.getElementById('statusText').textContent = '系统状态: 正常';
+                statusIndicator.style.backgroundColor = '#27ae60';
+                
+                showNotification('系统连接成功！');
+            }, 1500);
+        };
+    </script>
+</body>
+</html>
